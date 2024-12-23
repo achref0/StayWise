@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation{% endblock %}
+
+{% block content %}
+<h2>API Documentation</h2>
+
+<h3>City Search</h3>
+<pre>
+GET /api/city_search
+Parameters:
+- cityid (required): City ID
+- checkin (required): Check-in date (YYYY-MM-DD)
+- checkout (required): Check-out date (YYYY-MM-DD)
+- adults (optional): Number of adults (default: 2)
+- rooms (optional): Number of rooms (default: 1)
+- cur (optional): Currency (default: USD)
+</pre>
+
+<h3>Hotel Search</h3>
+<pre>
+GET /api/hotel_search
+Parameters:
+- hotelid (required): Hotel ID
+- checkin (required): Check-in date (YYYY-MM-DD)
+- checkout (required): Check-out date (YYYY-MM-DD)
+- adults (optional): Number of adults (default: 1)
+- rooms (optional): Number of rooms (default: 1)
+</pre>
+
+<h3>Booking.com Search</h3>
+<pre>
+GET /api/booking_search
+Parameters:
+- country (required): Country code
+- hotelid (required): Hotel ID
+- checkin (required): Check-in date (YYYY-MM-DD)
+- checkout (required): Check-out date (YYYY-MM-DD)
+- adults (optional): Number of adults (default: 2)
+- rooms (optional): Number of rooms (default: 1)
+- currency (optional): Currency (default: USD)
+- kids (optional): Number of kids (default: 0)
+</pre>
+
+<h3>Mapping Search</h3>
+<pre>
+GET /api/mapping
+Parameters:
+- name (required): Hotel or city name
+</pre>
+
+<h3>Account Information</h3>
+<pre>
+GET /api/account
+No parameters required
+</pre>
+{% endblock %}
+
