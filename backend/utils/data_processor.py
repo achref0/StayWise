@@ -35,10 +35,18 @@ class DataProcessor:
 
     def process_hotel_search(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Process hotel search results."""
-        if not data or 'comparison' not in data:
+        if not data or 'comparison' not in data or not data['comparison']:
             return {'comparison': [[]]}
 
-        return data  # Return as is since the structure matches the frontend expectations
+        processed_data = []
+        for item in data['comparison'][0]:
+            processed_item = {}
+            for key, value in item.items():
+                if key.startswith(('vendor', 'price', 'tax', 'Totalprice')):
+                    processed_item[key] = value
+            processed_data.append(processed_item)
+
+        return {'comparison': [processed_data]}
 
     def process_booking_search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Process Booking.com search results."""

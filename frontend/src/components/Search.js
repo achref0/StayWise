@@ -16,7 +16,7 @@ function Search() {
         checkin: event.target.checkin.value,
         checkout: event.target.checkout.value
       });
-      setResults(data);
+      setResults({ type: 'city', data });
     } catch (err) {
       setError('An error occurred while fetching data');
     }
@@ -33,7 +33,7 @@ function Search() {
         checkin: event.target.checkin.value,
         checkout: event.target.checkout.value
       });
-      setResults(data);
+      setResults({ type: 'hotel', data });
     } catch (err) {
       setError('An error occurred while fetching data');
     }
@@ -51,12 +51,79 @@ function Search() {
         checkin: event.target.checkin.value,
         checkout: event.target.checkout.value
       });
-      setResults(data);
+      setResults({ type: 'booking', data });
     } catch (err) {
       setError('An error occurred while fetching data');
     }
     setLoading(false);
   };
+
+  const renderCityResults = (data) => (
+    <div className="hotel-list">
+      {data.map((hotel, index) => (
+        <div key={index} className="hotel-card">
+          <h3>{hotel.name}</h3>
+          <p>Hotel ID: {hotel.hotelId}</p>
+          <p>Rating: {hotel.reviews.rating} ({hotel.reviews.count} reviews)</p>
+          <p>Phone: {hotel.telephone}</p>
+          <div className="price-list">
+            {Object.keys(hotel).filter(key => key.startsWith('vendor')).map((vendor, index) => {
+              const priceKey = `price${index + 1}`;
+              return <p key={vendor}>{hotel[vendor]}: {hotel[priceKey]}</p>;
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderHotelResults = (data) => {
+    if (!data || !data.comparison || !data.comparison[0]) {
+      return <p>No results found for this hotel.</p>;
+    }
+
+    return (
+      <div className="table-container">
+        <h3>Hotel Search Results</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Vendor</th>
+              <th>Total Price</th>
+              <th>Price</th>
+              <th>Tax</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.comparison[0].map((item, index) => (
+              <tr key={index}>
+                <td>{item[`vendor${index + 1}`] || 'N/A'}</td>
+                <td>{item[`Totalprice${index + 1}`] || 'N/A'}</td>
+                <td>{item[`price${index + 1}`] || 'N/A'}</td>
+                <td>{item[`tax${index + 1}`] || 'N/A'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  const renderBookingResults = (data) => (
+    <div className="room-list">
+      {data.map((room, index) => (
+        <div key={index} className="room-card">
+          <h3>{room.room}</h3>
+          <p>Price: {room.price}</p>
+          <ul>
+            {room.payment_details.map((detail, i) => (
+              <li key={i}>{detail}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div>
@@ -91,57 +158,9 @@ function Search() {
       {error && <div className="error">{error}</div>}
       {results && (
         <div id="results">
-          {Array.isArray(results) ? (
-            <div className="hotel-list">
-              {results.map((hotel, index) => (
-                <div key={index} className="hotel-card">
-                  <h3>{hotel.name}</h3>
-                  <p>Hotel ID: {hotel.hotelId}</p>
-                  <p>Rating: {hotel.reviews.rating} ({hotel.reviews.count} reviews)</p>
-                  <p>Phone: {hotel.telephone}</p>
-                  <div className="price-list">
-                    {Object.keys(hotel).filter(key => key.startsWith('vendor')).map((vendor, index) => {
-                      const priceKey = `price${index + 1}`;
-                      return <p key={vendor}>{hotel[vendor]}: {hotel[priceKey]}</p>;
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : results.comparison ? (
-            <table>
-              <thead>
-                <tr>
-                  <th>Vendor</th>
-                  <th>Price</th>
-                  <th>Tax</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.comparison[0].map((item, index) => (
-                  <tr key={index}>
-                    <td>{item[`vendor${index + 1}`]}</td>
-                    <td>{item[`price${index + 1}`]}</td>
-                    <td>{item[`tax${index + 1}`]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="room-list">
-              {results.map((room, index) => (
-                <div key={index} className="room-card">
-                  <h3>{room.room}</h3>
-                  <p>Price: {room.price}</p>
-                  <ul>
-                    {room.payment_details.map((detail, i) => (
-                      <li key={i}>{detail}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          )}
+          {results.type === 'city' && renderCityResults(results.data)}
+          {results.type === 'hotel' && renderHotelResults(results.data)}
+          {results.type === 'booking' && renderBookingResults(results.data)}
         </div>
       )}
     </div>
