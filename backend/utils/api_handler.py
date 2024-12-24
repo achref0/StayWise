@@ -1,68 +1,65 @@
 import requests
 import os
+import logging
 from typing import Dict, Any
+from urllib.parse import quote
 
 class APIHandler:
     def __init__(self):
         self.base_url = "https://api.makcorps.com"
         self.api_key = os.getenv('MAKCORPS_API_KEY')
+        logging.basicConfig(level=logging.DEBUG)
 
     def _make_request(self, endpoint: str, params: Dict[str, Any]) -> Dict:
         """Make a request to the Makcorps API with the API key."""
         url = f"{self.base_url}/{endpoint}"
-        # Always include api_key in params
         params['api_key'] = self.api_key
         
-        response = requests.get(url, params=params)
+        # URL encode the parameters
+        encoded_params = "&".join(f"{k}={quote(str(v))}" for k, v in params.items())
+        full_url = f"{url}?{encoded_params}"
+        
+        logging.debug(f"Making API request to: {full_url}")
+
+        response = requests.get(full_url)
+        
+        logging.debug(f"API response status code: {response.status_code}")
+        
+        if response.status_code != 200:
+            logging.error(f"API request failed. Status code: {response.status_code}")
+            logging.error(f"Response content: {response.text}")
+        
         response.raise_for_status()
         return response.json()
 
-    def city_search(self, params: Dict[str, Any]) -> Dict:
-        """Search hotels by city ID."""
-        required_params = {
-            'cityid': params.get('cityid'),
-            'pagination': params.get('pagination', '0'),
-            'cur': params.get('cur', 'USD'),
-            'rooms': params.get('rooms', '1'),
-            'adults': params.get('adults', '2'),
-            'checkin': params.get('checkin'),
-            'checkout': params.get('checkout'),
-            'tax': params.get('tax', 'false'),
-            'children': params.get('children', '0')
-        }
-        return self._make_request('city', required_params)
-
-    def hotel_search(self, params: Dict[str, Any]) -> Dict:
-        """Search prices for a specific hotel."""
-        required_params = {
-            'hotelid': params.get('hotelid'),
-            'rooms': params.get('rooms', '1'),
-            'adults': params.get('adults', '1'),
-            'checkin': params.get('checkin'),
-            'checkout': params.get('checkout')
-        }
-        return self._make_request('hotel', required_params)
-
-    def booking_search(self, params: Dict[str, Any]) -> Dict:
-        """Search Booking.com prices for a hotel."""
-        required_params = {
-            'country': params.get('country'),
-            'hotelid': params.get('hotelid'),
-            'checkin': params.get('checkin'),
-            'checkout': params.get('checkout'),
-            'currency': params.get('currency', 'USD'),
-            'kids': params.get('kids', '0'),
-            'adults': params.get('adults', '2'),
-            'rooms': params.get('rooms', '1')
-        }
-        return self._make_request('booking', required_params)
-
-    def mapping_search(self, params: Dict[str, Any]) -> Dict:
+    def mapping_search(self, name: str) -> Dict:
         """Search for hotel/city mapping information."""
-        required_params = {
-            'name': params.get('name')
+        params = {'name': name}
+        return self._make_request('mapping', params)
+
+    def city_search(self, cityid: str, checkin: str, checkout: str, rooms: str = '1', adults: str = '2', cur: str = 'USD') -> Dict:
+        """Search hotels by city ID."""
+        params = {
+            'cityid': cityid,
+            'pagination': '0',
+            'cur': cur,
+            'rooms': rooms,
+            'adults': adults,
+            'checkin': checkin,
+            'checkout': checkout
         }
-        return self._make_request('mapping', required_params)
+        return self._make_request('city', params)
+
+    def hotel_search(self, hotelid: str, checkin: str, checkout: str, rooms: str = '1', adults: str = '1') -> Dict:
+        """Search prices for a specific hotel."""
+        params = {
+            'hotelid': hotelid,
+            'rooms': rooms,
+            'adults': adults,
+            'checkin': checkin,
+            'checkout': checkout
+        }
+        return self._make_request('hotel', params)
 
     def get_account_info(self) -> Dict:
         """Get account information and API usage stats."""

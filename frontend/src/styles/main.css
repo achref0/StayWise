@@ -1,164 +1,169 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Add any custom styles here */
 body {
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f4;
-}
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  
+  .container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    padding: 20px;
+  }
+  
+  nav {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+  }
+  
+  nav ul {
+    padding: 0;
+    list-style: none;
+  }
+  
+  nav li {
+    display: inline;
+    padding: 0 20px;
+  }
+  
+  nav a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  h1, h2 {
+    color: #333;
+  }
+  
+  .search-container {
+    margin: 20px 0;
+  }
+  
+  input[type="text"],
+  input[type="date"] {
+    padding: 10px;
+    margin-right: 10px;
+    width: 200px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: #555;
+  }
+  
+  .loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #333;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 8px;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  .error {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .hotel-list,
+  .room-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .hotel-card,
+  .room-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    width: calc(33.333% - 20px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .progress-bar {
+    width: 100%;
+    background-color: #e0e0e0;
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+  }
+  
+  .progress-bar .progress {
+    display: block;
+    height: 22px;
+    background-color: #659cef;
+    border-radius: 3px;
+    transition: width 500ms ease-in-out;
+  }
 
-.container {
-  width: 80%;
-  margin: auto;
-  overflow: hidden;
-  padding: 20px;
-}
+  .table-container {
+  overflow-x: auto;
+  }
 
-nav {
-  background: #333;
-  color: #fff;
-  padding: 10px 0;
-}
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
 
-nav ul {
-  padding: 0;
-  list-style: none;
-}
+  th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
 
-nav li {
-  display: inline;
-  padding: 0 20px;
-}
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
 
-nav a {
-  color: #fff;
-  text-decoration: none;
-}
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
 
-h1, h2 {
-  color: #333;
-}
-
-.search-container {
-  margin: 20px 0;
-}
-
-input[type="text"],
-input[type="date"] {
-  padding: 10px;
-  margin-right: 10px;
-  width: 200px;
-}
-
-button {
-  padding: 10px 20px;
-  background: #333;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #555;
-}
-
-.loader {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #333;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-table, th, td {
-  border: 1px solid #ddd;
-}
-
-th, td {
-  text-align: left;
-  padding: 8px;
-}
-
-th {
-  background-color: #f2f2f2;
-}
-
-.error {
-  color: red;
-  font-weight: bold;
-}
-
-.hotel-list,
-.room-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.hotel-card,
-.room-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 15px;
-  width: calc(33.333% - 20px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.progress-bar {
-  width: 100%;
-  background-color: #e0e0e0;
-  padding: 3px;
-  border-radius: 3px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
-}
-
-.progress-bar .progress {
-  display: block;
-  height: 22px;
-  background-color: #659cef;
-  border-radius: 3px;
-  transition: width 500ms ease-in-out;
-}
-
-.table-container {
-overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-}
-
-th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
-
-tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-tr:hover {
-  background-color: #f5f5f5;
-}
+  tr:hover {
+    background-color: #f5f5f5;
+  }
 

@@ -1,166 +1,64 @@
-import React, { useState } from 'react';
-import { citySearch, hotelSearch, bookingSearch } from '../utils/api';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { searchHotels } from '../utils/api';
+import SearchForm from './SearchForm';
+import HotelCard from './HotelCard';
+import { Loader } from 'lucide-react';
 
 function Search() {
-  const [results, setResults] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const searchCity = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const governorate = searchParams.get('governorate');
+    if (governorate) {
+      handleSearch(governorate);
+    }
+  }, [location]);
+
+  const handleSearch = async (query) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await citySearch({
-        cityid: event.target.cityid.value,
-        checkin: event.target.checkin.value,
-        checkout: event.target.checkout.value
-      });
-      setResults({ type: 'city', data });
+      const results = await searchHotels(query);
+      setSearchResults(results);
+      navigate(`/search?query=${encodeURIComponent(query)}`, { replace: true });
     } catch (err) {
-      setError('An error occurred while fetching data');
+      setError('An error occurred while searching. Please try again.');
     }
     setLoading(false);
   };
-
-  const searchHotel = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await hotelSearch({
-        hotelid: event.target.hotelid.value,
-        checkin: event.target.checkin.value,
-        checkout: event.target.checkout.value
-      });
-      setResults({ type: 'hotel', data });
-    } catch (err) {
-      setError('An error occurred while fetching data');
-    }
-    setLoading(false);
-  };
-
-  const searchBooking = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await bookingSearch({
-        country: event.target.country.value,
-        hotelid: event.target.hotelid.value,
-        checkin: event.target.checkin.value,
-        checkout: event.target.checkout.value
-      });
-      setResults({ type: 'booking', data });
-    } catch (err) {
-      setError('An error occurred while fetching data');
-    }
-    setLoading(false);
-  };
-
-  const renderCityResults = (data) => (
-    <div className="hotel-list">
-      {data.map((hotel, index) => (
-        <div key={index} className="hotel-card">
-          <h3>{hotel.name}</h3>
-          <p>Hotel ID: {hotel.hotelId}</p>
-          <p>Rating: {hotel.reviews.rating} ({hotel.reviews.count} reviews)</p>
-          <p>Phone: {hotel.telephone}</p>
-          <div className="price-list">
-            {Object.keys(hotel).filter(key => key.startsWith('vendor')).map((vendor, index) => {
-              const priceKey = `price${index + 1}`;
-              return <p key={vendor}>{hotel[vendor]}: {hotel[priceKey]}</p>;
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderHotelResults = (data) => {
-    if (!data || !data.comparison || !data.comparison[0]) {
-      return <p>No results found for this hotel.</p>;
-    }
-
-    return (
-      <div className="table-container">
-        <h3>Hotel Search Results</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Vendor</th>
-              <th>Total Price</th>
-              <th>Price</th>
-              <th>Tax</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.comparison[0].map((item, index) => (
-              <tr key={index}>
-                <td>{item[`vendor${index + 1}`] || 'N/A'}</td>
-                <td>{item[`Totalprice${index + 1}`] || 'N/A'}</td>
-                <td>{item[`price${index + 1}`] || 'N/A'}</td>
-                <td>{item[`tax${index + 1}`] || 'N/A'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
-  const renderBookingResults = (data) => (
-    <div className="room-list">
-      {data.map((room, index) => (
-        <div key={index} className="room-card">
-          <h3>{room.room}</h3>
-          <p>Price: {room.price}</p>
-          <ul>
-            {room.payment_details.map((detail, i) => (
-              <li key={i}>{detail}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  );
 
   return (
-    <div>
-      <h1>Hotel Search</h1>
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Search Hotels</h1>
+        <SearchForm onSearch={handleSearch} />
+      </div>
 
-      <h2>City Search</h2>
-      <form onSubmit={searchCity} className="search-container">
-        <input type="text" id="cityid" placeholder="Enter City ID" required />
-        <input type="date" id="checkin" placeholder="Check-in Date" required />
-        <input type="date" id="checkout" placeholder="Check-out Date" required />
-        <button type="submit">Search City</button>
-      </form>
-
-      <h2>Hotel Search</h2>
-      <form onSubmit={searchHotel} className="search-container">
-        <input type="text" id="hotelid" placeholder="Enter Hotel ID" required />
-        <input type="date" id="checkin" placeholder="Check-in Date" required />
-        <input type="date" id="checkout" placeholder="Check-out Date" required />
-        <button type="submit">Search Hotel</button>
-      </form>
-
-      <h2>Booking.com Search</h2>
-      <form onSubmit={searchBooking} className="search-container">
-        <input type="text" id="country" placeholder="Enter Country Code" required />
-        <input type="text" id="hotelid" placeholder="Enter Hotel ID" required />
-        <input type="date" id="checkin" placeholder="Check-in Date" required />
-        <input type="date" id="checkout" placeholder="Check-out Date" required />
-        <button type="submit">Search Booking.com</button>
-      </form>
-
-      {loading && <div id="loader" className="loader"></div>}
-      {error && <div className="error">{error}</div>}
-      {results && (
-        <div id="results">
-          {results.type === 'city' && renderCityResults(results.data)}
-          {results.type === 'hotel' && renderHotelResults(results.data)}
-          {results.type === 'booking' && renderBookingResults(results.data)}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader className="w-8 h-8 text-blue-600 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg p-4 text-center">
+          {error}
+        </div>
+      ) : searchResults.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {searchResults.map((hotel) => (
+            <HotelCard key={hotel.hotelId} hotel={hotel} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">
+            No results found. Try a different search term.
+          </p>
         </div>
       )}
     </div>

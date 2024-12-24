@@ -1,32 +1,25 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Header from './components/Header';
 import Home from './components/Home';
 import Search from './components/Search';
-import Mapping from './components/Mapping';
+import HotelDetails from './components/HotelDetails';
 import Account from './components/Account';
 import './styles/main.css';
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <nav>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/search">Hotel Price Search</a></li>
-            <li><a href="/mapping">Hotel/City Mapping</a></li>
-            <li><a href="/account">API Usage Information</a></li>
-          </ul>
-        </nav>
-
-        <div className="container">
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/mapping" element={<Mapping />} />
+            <Route path="/hotel/:id" element={<HotelDetails />} />
             <Route path="/account" element={<Account />} />
           </Routes>
-        </div>
+        </main>
       </div>
     </Router>
   );
