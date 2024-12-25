@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
 import { searchHotels } from '../utils/api';
-import SearchForm from './SearchForm';
 import HotelCard from './HotelCard';
-import { Loader } from 'lucide-react';
 
 function Search() {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [query, setQuery] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -16,52 +16,79 @@ function Search() {
     const searchParams = new URLSearchParams(location.search);
     const governorate = searchParams.get('governorate');
     if (governorate) {
+      setQuery(governorate);
       handleSearch(governorate);
     }
   }, [location]);
 
-  const handleSearch = async (query) => {
+  const handleSearch = async (searchQuery) => {
     setLoading(true);
     setError(null);
     try {
-      const results = await searchHotels(query);
+      const results = await searchHotels(searchQuery);
       setSearchResults(results);
-      navigate(`/search?query=${encodeURIComponent(query)}`, { replace: true });
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`, { replace: true });
     } catch (err) {
       setError('An error occurred while searching. Please try again.');
     }
     setLoading(false);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (query.trim()) {
+      handleSearch(query);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Search Hotels</h1>
-        <SearchForm onSearch={handleSearch} />
-      </div>
+    <Container>
+      <h1 className="text-center mb-4">Find Your Perfect Stay</h1>
+      <Row className="justify-content-center mb-4">
+        <Col md={8}>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Control
+                type="text"
+                placeholder="Search for a city or hotel"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </Form.Group>
+            <div className="d-grid">
+              <Button variant="primary" type="submit">
+                <i className="fas fa-search me-2"></i>
+                Search
+              </Button>
+            </div>
+          </Form>
+        </Col>
+      </Row>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader className="w-8 h-8 text-blue-600 animate-spin" />
+        <div className="text-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
         </div>
       ) : error ? (
-        <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg p-4 text-center">
+        <div className="alert alert-danger" role="alert">
           {error}
         </div>
       ) : searchResults.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Row xs={1} md={2} lg={3} className="g-4">
           {searchResults.map((hotel) => (
-            <HotelCard key={hotel.hotelId} hotel={hotel} />
+            <Col key={hotel.hotelId}>
+              <HotelCard hotel={hotel} />
+            </Col>
           ))}
-        </div>
+        </Row>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
-            No results found. Try a different search term.
-          </p>
-        </div>
+        <p className="text-center text-muted">
+          No results found. Try a different search term.
+        </p>
       )}
-    </div>
+    </Container>
   );
 }
 

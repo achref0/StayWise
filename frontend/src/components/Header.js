@@ -1,48 +1,35 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, User } from 'lucide-react';
+import { Navbar, Nav, Container } from 'react-bootstrap';
 
 function Header() {
   const location = useLocation();
 
   const isActive = (path) => {
-    return location.pathname === path ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600';
+    return location.pathname === path ? 'active' : '';
   };
 
   return (
-    <header className="bg-white shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
-            StayWise
-          </Link>
-          <nav>
-            <ul className="flex items-center space-x-8">
-              <li>
-                <Link to="/" className={`flex items-center space-x-2 ${isActive('/')}`}>
-                  <Home className="w-5 h-5" />
-                  <span>Home</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/search" className={`flex items-center space-x-2 ${isActive('/search')}`}>
-                  <Search className="w-5 h-5" />
-                  <span>Search</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/account" className={`flex items-center space-x-2 ${isActive('/account')}`}>
-                  <User className="w-5 h-5" />
-                  <span>Account</span>
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-    </header>
+    <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="mb-0 custom-navbar">
+      <Container>
+        <Navbar.Brand as={Link} to="/" className="fw-bold">StayWise</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto">
+            <Nav.Link as={Link} to="/" className={isActive('/')}>
+              <i className="fas fa-home me-2"></i>Home
+            </Nav.Link>
+            <Nav.Link as={Link} to="/search" className={isActive('/search')}>
+              <i className="fas fa-search me-2"></i>Search
+            </Nav.Link>
+            <Nav.Link as={Link} to="/account" className={isActive('/account')}>
+              <i className="fas fa-user me-2"></i>Account
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }
 
 export default Header;
-

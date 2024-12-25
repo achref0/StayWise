@@ -1,6 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Star, Building } from 'lucide-react';
+import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
+
+// List of background images
+const BACKGROUND_IMAGES = [
+  '/tun3.jpg',
+  '/tub.jpg',
+  '/tub.png',
+  '/tun.jpg',
+  '/tun1.jpg',
+  '/tun4.jpg',
+  '/tun5.png',
+  '/tun6.jpg',
+  '/tun7.jpg',
+];
 
 const TUNISIAN_GOVERNORATES = [
   "Tunis", "Ariana", "Ben Arous", "Manouba", "Nabeul", "Zaghouan", "Bizerte", "Béja",
@@ -10,7 +23,40 @@ const TUNISIAN_GOVERNORATES = [
 
 function Home() {
   const [selectedGovernorate, setSelectedGovernorate] = useState('');
+  const [currentBackground, setCurrentBackground] = useState(0);
+  const [opacity, setOpacity] = useState(1);  // For fading background image on scroll
   const navigate = useNavigate();
+
+  // Preload all background images
+  useEffect(() => {
+    const preloadImages = () => {
+      BACKGROUND_IMAGES.forEach((image) => {
+        const img = new Image();
+        img.src = image;
+      });
+    };
+    preloadImages();
+
+    let index = 0;
+    const interval = setInterval(() => {
+      setCurrentBackground((prevIndex) => (prevIndex + 1) % BACKGROUND_IMAGES.length);
+    }, 5000);
+
+    // Scroll event listener to fade out background image
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const fadeOutThreshold = 300; // Change this threshold value as needed
+      const newOpacity = Math.max(1 - scrollY / fadeOutThreshold, 0);  // Gradually decrease opacity
+      setOpacity(newOpacity);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const handleGovernorateChange = (event) => {
     setSelectedGovernorate(event.target.value);
@@ -19,77 +65,117 @@ function Home() {
   const handleSearch = () => {
     if (selectedGovernorate) {
       navigate(`/search?governorate=${encodeURIComponent(selectedGovernorate)}`);
+    } else {
+      alert("Please select a governorate before searching.");
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Find Your Perfect Stay in Tunisia
-        </h1>
-        <p className="text-lg text-gray-600 mb-8">
-          Discover the best hotels across Tunisia's beautiful governorates
-        </p>
-      </div>
-
-      <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-        <div className="grid gap-8">
-          <div className="flex flex-col space-y-4">
-            <label htmlFor="governorate" className="text-lg font-medium text-gray-700">
-              Select a Governorate
-            </label>
-            <div className="relative">
-              <select
-                id="governorate"
-                value={selectedGovernorate}
-                onChange={handleGovernorateChange}
-                className="w-full p-4 pr-12 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Choose a governorate...</option>
-                {TUNISIAN_GOVERNORATES.map((governorate) => (
-                  <option key={governorate} value={governorate}>
-                    {governorate}
-                  </option>
-                ))}
-              </select>
-              <MapPin className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
-            </div>
-          </div>
-
-          <button
-            onClick={handleSearch}
-            disabled={!selectedGovernorate}
-            className="w-full bg-blue-600 text-white py-4 rounded-lg text-lg font-medium hover:bg-blue-700 
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
-                     disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    <div>
+      {/* Hero Section */}
+      <div className="hero-section text-center text-white py-5 mb-5" style={{ opacity: opacity }}>
+        <Container>
+          <h1 className="display-4 fw-bold mb-4 animate__animated animate__fadeIn">Find Your Perfect Stay in Tunisia</h1>
+          <p className="lead mb-4 animate__animated animate__fadeIn animate__delay-1s">Discover the best hotels across Tunisia's beautiful governorates</p>
+          <Button 
+            variant="primary" 
+            size="lg" 
+            className="animate__animated animate__fadeIn animate__delay-2s"
+            onClick={() => document.getElementById('search-section').scrollIntoView({ behavior: 'smooth' })}
+            aria-label="Explore hotels in Tunisia"
           >
-            <Search className="inline-block w-5 h-5 mr-2 -mt-1" />
-            Search Hotels
-          </button>
+            Explore Now
+          </Button>
+        </Container>
+
+        {/* Background Images with Smooth Fade Transition */}
+        <div className="background-images">
+          {BACKGROUND_IMAGES.map((image, index) => (
+            <div
+              key={index}
+              className={`background-image ${index === currentBackground ? 'active' : ''}`}
+              style={{ backgroundImage: `url(${image})` }}
+            />
+          ))}
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="bg-white rounded-xl p-6 shadow-md">
-          <Building className="w-10 h-10 text-blue-600 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Wide Selection</h3>
-          <p className="text-gray-600">Browse through hundreds of hotels across Tunisia</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-md">
-          <Star className="w-10 h-10 text-blue-600 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Best Prices</h3>
-          <p className="text-gray-600">Compare prices from multiple booking platforms</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-md">
-          <MapPin className="w-10 h-10 text-blue-600 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Perfect Location</h3>
-          <p className="text-gray-600">Find hotels in your preferred governorate</p>
-        </div>
-      </div>
+      {/* Search Section */}
+      <Container id="search-section" className="mb-5">
+        <Row className="justify-content-center">
+          <Col md={8}>
+            <Card className="shadow-lg">
+              <Card.Body>
+                <h2 className="text-center mb-4">Find Your Perfect Hotel</h2>
+                <Form>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Select a Governorate</Form.Label>
+                    <Form.Select 
+                      value={selectedGovernorate} 
+                      onChange={handleGovernorateChange}
+                      aria-label="Select a governorate"
+                    >
+                      <option value="">Choose a governorate...</option>
+                      {TUNISIAN_GOVERNORATES.map((governorate) => (
+                        <option key={governorate} value={governorate}>
+                          {governorate}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                  <div className="d-grid">
+                    <Button 
+                      variant="primary" 
+                      size="lg" 
+                      onClick={handleSearch}
+                      disabled={!selectedGovernorate}
+                      aria-label="Search hotels in the selected governorate"
+                    >
+                      <i className="fas fa-search me-2"></i>
+                      Search Hotels
+                    </Button>
+                  </div>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+
+      {/* Feature Section */}
+      <Container className="mb-5">
+        <Row>
+          <Col md={4} className="mb-4">
+            <Card className="h-100 shadow feature-card">
+              <Card.Body className="text-center">
+                <i className="fas fa-building fa-3x text-primary mb-3"></i>
+                <Card.Title>Wide Selection</Card.Title>
+                <Card.Text>Browse through hundreds of hotels across Tunisia</Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={4} className="mb-4">
+            <Card className="h-100 shadow feature-card">
+              <Card.Body className="text-center">
+                <i className="fas fa-star fa-3x text-warning mb-3"></i>
+                <Card.Title>Best Prices</Card.Title>
+                <Card.Text>Compare prices from multiple booking platforms</Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={4} className="mb-4">
+            <Card className="h-100 shadow feature-card">
+              <Card.Body className="text-center">
+                <i className="fas fa-map-marker-alt fa-3x text-success mb-3"></i>
+                <Card.Title>Perfect Location</Card.Title>
+                <Card.Text>Find hotels in your preferred governorate</Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 }
 
 export default Home;
-
