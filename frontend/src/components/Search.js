@@ -85,7 +85,7 @@ function Search() {
         </Row>
       ) : (
         <p className="text-center text-muted">
-          No results found. Try a different search term.
+          No results found? Try a different search term.
         </p>
       )}
     </Container>

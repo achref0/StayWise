@@ -12,7 +12,7 @@ function Header() {
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top" className="mb-0 custom-navbar">
       <Container>
-        <Navbar.Brand as={Link} to="/" className="fw-bold">StayWise</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/" className="fw-bold">staywise</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">

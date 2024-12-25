@@ -13,6 +13,10 @@ const BACKGROUND_IMAGES = [
   '/tun5.png',
   '/tun6.jpg',
   '/tun7.jpg',
+  '/tun8.jpg',
+  '/tun9.jpg',
+  '/tun10.jpg',
+  '/tun11.jpg',
 ];
 
 const TUNISIAN_GOVERNORATES = [
