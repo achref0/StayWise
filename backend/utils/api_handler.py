@@ -65,3 +65,79 @@ class APIHandler:
         """Get account information and API usage stats."""
         return self._make_request('account', {})
 
+    def fetch_wikipedia_intro(self, governorate: str) -> str:
+        """Fetch the introduction section of a Wikipedia page."""
+        intro_mappings = {
+            "Tunis": "Tunis_Governorate",
+            "Ariana": "Ariana_Governorate",
+            "Ben Arous": "Ben_Arous_Governorate",
+            "Manouba": "Manouba_Governorate",
+            "Nabeul": "Nabeul_Governorate",
+            "Zaghouan": "Zaghouan_Governorate",
+            "Bizerte": "Bizerte_Governorate",
+            "Béja": "Béja_Governorate",
+            "Jendouba": "Jendouba_Governorate",
+            "Kef": "Kef_Governorate",
+            "Siliana": "Siliana_Governorate",
+            "Kairouan": "Kairouan_Governorate",
+            "Kasserine": "Kasserine_Governorate",
+            "Sidi Bouzid": "Sidi_Bouzid_Governorate",
+            "Sousse": "Sousse_Governorate",
+            "Monastir": "Monastir_Governorate",
+            "Mahdia": "Mahdia_Governorate",
+            "Sfax": "Sfax_Governorate",
+            "Gafsa": "Gafsa_Governorate",
+            "Tozeur": "Tozeur_Governorate",
+            "Kebili": "Kebili_Governorate",
+            "Gabès": "Gabès_Governorate",
+            "Medenine": "Medenine_Governorate",
+            "Tataouine": "Tataouine_Governorate"
+        }
+
+        query_name = intro_mappings.get(governorate, governorate)
+        url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{quote(query_name)}"
+        logging.debug(f"Fetching Wikipedia intro for: {query_name}")
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('extract', "No introduction available.")
+
+    def fetch_wikipedia_images(self, governorate: str) -> list:
+        """Fetch images related to a Wikipedia page."""
+        image_mappings = {
+            "Tunis": "Tunis",
+            "Ariana": "Ariana_(Tunisia)",
+            "Ben Arous": "Ben_Arous_Governorate",
+            "Manouba": "Manouba",
+            "Nabeul": "Nabeul",
+            "Zaghouan": "Zaghouan",
+            "Bizerte": "Bizerte",
+            "Béja": "Béja",
+            "Jendouba": "Jendouba",
+            "Kef": "El_Kef",
+            "Siliana": "Siliana",
+            "Kairouan": "Kairouan",
+            "Kasserine": "Kasserine_Governorate",
+            "Sidi Bouzid": "Sidi_Bouzid",
+            "Sousse": "Sousse",
+            "Monastir": "Monastir,_Tunisia",
+            "Mahdia": "Mahdia",
+            "Sfax": "Sfax",
+            "Gafsa": "Gafsa",
+            "Tozeur": "Tozeur",
+            "Kebili": "Kebili",
+            "Gabès": "Gabès",
+            "Medenine": "Medenine",
+            "Tataouine": "Tataouine"
+        }
+
+        query_name = image_mappings.get(governorate, governorate)
+        url = f"https://en.wikipedia.org/api/rest_v1/page/media-list/{quote(query_name)}"
+        logging.debug(f"Fetching Wikipedia images for: {query_name}")
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return [
+            item['srcset'][-1]['src']  # Get the highest resolution image
+            for item in data.get('items', []) if item.get('type') == 'image'
+        ]

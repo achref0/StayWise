@@ -12,6 +12,16 @@ export const searchHotels = async (query) => {
   }
 };
 
+export const getGovernorateInfo = async (governorate) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/governorate-info/${governorate}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching governorate info:', error);
+    throw error;
+  }
+};
+
 export const getHotelDetails = async (hotelId) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/hotel_search`, { params: { hotelid: hotelId } });
@@ -31,4 +41,3 @@ export const getAccountInfo = async () => {
     throw error;
   }
 };
-

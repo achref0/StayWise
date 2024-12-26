@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
-import { searchHotels } from '../utils/api';
+import { getGovernorateInfo, searchHotels } from '../utils/api';
 import HotelCard from './HotelCard';
+import Carousel from 'react-bootstrap/Carousel';  // Import Carousel component
 
 function Search() {
   const [searchResults, setSearchResults] = useState([]);
+  const [governorateInfo, setGovernorateInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
+  const [showHotels, setShowHotels] = useState(false);  // State to control hotel section visibility
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -17,19 +20,42 @@ function Search() {
     const governorate = searchParams.get('governorate');
     if (governorate) {
       setQuery(governorate);
-      handleSearch(governorate);
+      fetchGovernorateInfo(governorate);
     }
   }, [location]);
 
-  const handleSearch = async (searchQuery) => {
+  const fetchGovernorateInfo = async (governorate) => {
     setLoading(true);
     setError(null);
     try {
-      const results = await searchHotels(searchQuery);
-      setSearchResults(results);
-      navigate(`/search?query=${encodeURIComponent(searchQuery)}`, { replace: true });
+      const info = await getGovernorateInfo(governorate);
+      console.log("Governorate Info: ", info);
+      if (!info.introduction && !info.images.length) {
+        setError('No information found for the selected governorate.');
+      }
+      setGovernorateInfo(info);
+      setShowHotels(false);  // Reset showHotels state when new governorate is fetched
     } catch (err) {
-      setError('An error occurred while searching. Please try again.');
+      console.error('Error fetching governorate info:', err);
+      setError('An error occurred while fetching governorate info. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  const handleSearchHotels = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const results = await searchHotels(query);
+      setSearchResults(results);
+      setShowHotels(true);  // Show hotels section after search
+    } catch (err) {
+      console.error('Error during hotel search:', err);
+      if (err.response && err.response.status === 429) {
+        setError('Request limit reached for hotel search. Please try again later.');
+      } else {
+        setError('An error occurred while searching for hotels. Please try again.');
+      }
     }
     setLoading(false);
   };
@@ -37,7 +63,7 @@ function Search() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
-      handleSearch(query);
+      fetchGovernorateInfo(query);
     }
   };
 
@@ -50,7 +76,7 @@ function Search() {
             <Form.Group className="mb-3">
               <Form.Control
                 type="text"
-                placeholder="Search for a city or hotel"
+                placeholder="Search for a city or governorate"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -75,22 +101,45 @@ function Search() {
         <div className="alert alert-danger" role="alert">
           {error}
         </div>
-      ) : searchResults.length > 0 ? (
-        <Row xs={1} md={2} lg={3} className="g-4">
-          {searchResults.map((hotel) => (
-            <Col key={hotel.hotelId}>
-              <HotelCard hotel={hotel} />
-            </Col>
-          ))}
-        </Row>
       ) : (
-        <p className="text-center text-muted">
-          No results found? Try a different search term.
-        </p>
+        <>
+          {governorateInfo && (
+            <div>
+              <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5em', color: '#333' }}>{governorateInfo.introduction}</h2>
+              <Carousel>
+                {governorateInfo.images.map((img, index) => (
+                  <Carousel.Item key={`image-${index}`}>
+                    <img className="d-block w-100 carousel-image" src={`https:${img}`} alt={`Slide ${index}`} />
+                  </Carousel.Item>
+                ))}
+              </Carousel>
+              <Button variant="secondary" className="mt-3" onClick={handleSearchHotels}>
+                Look for Hotels
+              </Button>
+            </div>
+          )}
+          {showHotels && (
+            <>
+              <h3 className="mt-4">Hotel Search Results</h3>
+              {searchResults.length > 0 ? (
+                <Row xs={1} md={2} lg={3} className="g-4">
+                  {searchResults.map((hotel) => (
+                    <Col key={hotel.hotelId}>
+                      <HotelCard hotel={hotel} />
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <p className="text-center text-muted">
+                  No results found. Try a different search term.
+                </p>
+              )}
+            </>
+          )}
+        </>
       )}
     </Container>
   );
 }
 
 export default Search;
-

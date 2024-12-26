@@ -109,3 +109,36 @@ body {
     padding: 1.5rem;
   }
 }
+
+
+/* main.css */
+
+.carousel-image {
+  max-height: 500px;  /* Set a maximum height to make the images smaller */
+  width: 100%;       /* Maintain the image aspect ratio */
+  object-fit: contain;  /* Ensure the images fit within the container without being cropped */
+  margin: 0 auto;     /* Center the images */
+  display: block;     /* Ensure images are displayed as block elements */
+}
+
+.carousel-control-prev, .carousel-control-next {
+  width: 5%;  /* Reduce the width of the control areas */
+}
+
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  background-size: 50%, 50%;  /* Scale the size of the arrow icons */
+}
+
+/* Optional: Customize the arrow color */
+.carousel-control-prev-icon {
+  background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns%3D"http://www.w3.org/2000/svg" viewBox%3D"0 0 16 16"%3E%3Cpath fill%3D"%23000" d%3D"M11.354 1.354a.5.5 0 0 1 0 .708L6.707 6.707l4.647 4.646a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 0 1 .708 0z"%3E%3C/path%3E%3C/svg%3E');
+}
+
+.carousel-control-next-icon {
+  background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns%3D"http://www.w3.org/2000/svg" viewBox%3D"0 0 16 16"%3E%3Cpath fill%3D"%23000" d%3D"M4.646 1.354a.5.5 0 0 1 0 .708L9.293 6.707 4.646 11.354a.5.5 0 1 1-.708-.708l5-5a.5.5 0 0 1 0-.708l-5-5a.5.5 0 0 1 .708 0z"%3E%3C/path%3E%3C/svg%3E');
+}
+
+
+
+
+

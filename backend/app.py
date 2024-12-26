@@ -5,6 +5,7 @@ from utils.data_processor import DataProcessor
 import os
 import logging
 from datetime import datetime, timedelta
+import requests  # Import the requests module
 
 app = Flask(__name__)
 CORS(app)
@@ -14,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 api_handler = APIHandler()
 data_processor = DataProcessor()
 
-# Fallback mapping of governorates to city IDs
+# Fallback mapping of governorates to city IDs (used only when a governorate is selected)
 TUNISIAN_GOVERNORATES = {
     "Tunis": 2629167,
     "Ariana": 2629124,
@@ -42,6 +43,9 @@ TUNISIAN_GOVERNORATES = {
     "Tataouine": 2629165
 }
 
+# Simple cache to store city IDs for previously searched queries
+city_id_cache = {}
+
 @app.route('/api/search', methods=['GET'])
 def search_hotels():
     """Handle hotel search requests for governorates or specific queries."""
@@ -52,34 +56,50 @@ def search_hotels():
     try:
         city_id = None
         
-        # First, check if the query matches a governorate name
-        if query in TUNISIAN_GOVERNORATES:
-            city_id = TUNISIAN_GOVERNORATES[query]
-            logging.debug(f"Using predefined city ID for {query}: {city_id}")
+        # Check if the city ID has been cached previously
+        if query in city_id_cache:
+            city_id = city_id_cache[query]
+            logging.debug(f"Using cached city ID for {query}: {city_id}")
         else:
-            # If not, try mapping search to get the city ID
-            logging.debug(f"Attempting mapping search for query: {query}")
-            mapping_results = api_handler.mapping_search(query)
-            processed_mapping = data_processor.process_mapping_search(mapping_results)
-
-            if processed_mapping:
-                city_id = processed_mapping[0]['id']
-                logging.debug(f"Mapping search successful. City ID: {city_id}")
+            # First, check if the query matches a governorate name (used only when selecting a governorate)
+            if query in TUNISIAN_GOVERNORATES:
+                city_id = TUNISIAN_GOVERNORATES[query]
+                logging.debug(f"Using predefined city ID for {query}: {city_id}")
             else:
-                logging.warning(f"No mapping results found for query: {query}")
+                # If not, try mapping search to get the city ID
+                logging.debug(f"Attempting mapping search for query: {query}")
+                mapping_results = api_handler.mapping_search(query)
+                processed_mapping = data_processor.process_mapping_search(mapping_results)
+
+                if processed_mapping:
+                    city_id = processed_mapping[0]['id']
+                    logging.debug(f"Mapping search successful. City ID: {city_id}")
+                else:
+                    logging.warning(f"No mapping results found for query: {query}")
+
+            # Cache the city ID for future use
+            if city_id:
+                city_id_cache[query] = city_id
 
         if city_id:
             # Use the city ID to search for hotels
             logging.debug(f"Searching for hotels with city ID: {city_id}")
             checkin = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
             checkout = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d')
-            city_results = api_handler.city_search(
-                cityid=str(city_id),
-                checkin=checkin,
-                checkout=checkout
-            )
-            processed_city = data_processor.process_city_search(city_results)
-            return jsonify(processed_city)
+            try:
+                city_results = api_handler.city_search(
+                    cityid=str(city_id),
+                    checkin=checkin,
+                    checkout=checkout
+                )
+                processed_city = data_processor.process_city_search(city_results)
+                return jsonify(processed_city)
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 429:
+                    logging.error(f"Error in search_hotels: {str(e)}")
+                    return jsonify({"error": "Request limit reached. Please try again later."}), 429
+                else:
+                    raise e
         else:
             logging.warning(f"No city ID found for query: {query}")
             return jsonify([])
@@ -123,8 +143,25 @@ def get_account_info():
     except Exception as e:
         logging.error(f"Error in get_account_info: {str(e)}")
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/governorate-info/<governorate>', methods=['GET'])
+def get_governorate_info(governorate): 
+    """Fetch introduction and images for a given governorate.""" 
+    if not governorate: 
+        return jsonify({"error": "Governorate parameter is required"}), 400 
+    try: 
+        intro = api_handler.fetch_wikipedia_intro(governorate)  # Use the APIHandler instance
+        images = api_handler.fetch_wikipedia_images(governorate)  # Use the APIHandler instance
+        return jsonify({ 
+            "governorate": governorate, 
+            "introduction": intro, 
+            "images": images 
+        }) 
+    except Exception as e: 
+        logging.error(f"Error in get_governorate_info: {str(e)}") 
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
