@@ -8,8 +8,15 @@ body {
 
 /* Navbar custom height */
 .custom-navbar {
-  padding: 1.5rem 0; /* Adjust this to change the navbar height */
+  padding: 0.5rem 0; /* Reduce the top and bottom padding to make the navbar thinner */
   z-index: 3; /* Ensure navbar stays on top */
+}
+
+/* Override the default padding inside the navbar */
+.custom-navbar .navbar-brand, 
+.custom-navbar .navbar-nav .nav-link {
+  padding-top: 0.2rem; /* Reduce the top padding */
+  padding-bottom: 0.2rem; /* Reduce the bottom padding */
 }
 
 /* Ensure the hero section takes full width and no padding/margin */
@@ -111,7 +118,6 @@ body {
 }
 
 
-/* main.css */
 
 .carousel-image {
   max-height: 500px;  /* Set a maximum height to make the images smaller */

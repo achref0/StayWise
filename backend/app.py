@@ -128,11 +128,29 @@ def hotel_search():
             rooms=rooms,
             adults=adults
         )
+        logging.debug(f"Raw data from API: {raw_data}")
+        
         processed_data = data_processor.process_hotel_search(raw_data)
-        return jsonify(processed_data)
+        logging.debug(f"Processed data: {processed_data}")
+        
+        if 'comparison' in processed_data and processed_data['comparison']:
+            # Filter out vendors with null prices and include vendor and tax information
+            filtered_comparison = [
+                {k: v for k, v in vendor.items() if v is not None and k.startswith(('vendor', 'price', 'tax', 'Totalprice'))}
+                for vendor in processed_data['comparison'][0]
+                if any(v is not None and k.startswith('price') for k, v in vendor.items())
+            ]
+            logging.debug(f"Filtered comparison: {filtered_comparison}")
+            return jsonify({'comparison': [filtered_comparison]})
+        else:
+            logging.warning("No comparison data available")
+            return jsonify({'error': 'No comparison data available'}), 404
     except Exception as e:
         logging.error(f"Error in hotel_search: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+
 
 @app.route('/api/account', methods=['GET'])
 def get_account_info():

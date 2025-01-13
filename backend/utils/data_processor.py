@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List, Any
 
 class DataProcessor:
@@ -37,7 +38,8 @@ class DataProcessor:
                     'telephone': hotel.get('telephone', ''),
                     'name': hotel.get('name', ''),
                     'hotelId': hotel.get('hotelId', ''),
-                    'reviews': hotel.get('reviews', {'rating': 0, 'count': 0})
+                    'reviews': hotel.get('reviews', {'rating': 0, 'count': 0}),
+                    'address': hotel.get('address', '')  # Ensure address is included
                 }
 
                 for i in range(1, 5):  # Assuming max 4 vendors
@@ -55,14 +57,24 @@ class DataProcessor:
         """Process hotel search results."""
         if not data or 'comparison' not in data:
             return {'comparison': [[]]}
-
-        processed_data = []
+        
+        processed_hotel = {
+            'name': data.get('name', ''),
+            'geocode': data.get('geocode', {'latitude': 0, 'longitude': 0}),
+            'telephone': data.get('telephone', ''),
+            'reviews': data.get('reviews', {'rating': 0, 'count': 0}),
+            'address': data.get('address', ''),
+            'image': data.get('image', '')
+        }
+        
+        processed_comparison = []
         for item in data['comparison'][0]:
             processed_item = {}
             for key, value in item.items():
                 if key.startswith(('vendor', 'price', 'tax', 'Totalprice')):
                     processed_item[key] = value
-            processed_data.append(processed_item)
+            processed_comparison.append(processed_item)
 
-        return {'comparison': [processed_data]}
+        logging.debug(f"Processed comparison in data_processor: {processed_comparison}")
+        return {'comparison': [processed_comparison], **processed_hotel}
 

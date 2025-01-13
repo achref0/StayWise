@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
 import { getGovernorateInfo, searchHotels } from '../utils/api';
 import HotelCard from './HotelCard';
-import Carousel from 'react-bootstrap/Carousel';  // Import Carousel component
+import Carousel from 'react-bootstrap/Carousel';
 
 function Search() {
   const [searchResults, setSearchResults] = useState([]);
@@ -11,7 +11,7 @@ function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
-  const [showHotels, setShowHotels] = useState(false);  // State to control hotel section visibility
+  const [showHotels, setShowHotels] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -34,7 +34,7 @@ function Search() {
         setError('No information found for the selected governorate.');
       }
       setGovernorateInfo(info);
-      setShowHotels(false);  // Reset showHotels state when new governorate is fetched
+      setShowHotels(false);
     } catch (err) {
       console.error('Error fetching governorate info:', err);
       setError('An error occurred while fetching governorate info. Please try again.');
@@ -48,7 +48,10 @@ function Search() {
     try {
       const results = await searchHotels(query);
       setSearchResults(results);
-      setShowHotels(true);  // Show hotels section after search
+      // Store full hotel data in localStorage
+      localStorage.setItem('hotelSearchResults', JSON.stringify(results));
+      console.log('Hotel data stored in localStorage:', results);
+      setShowHotels(true);
     } catch (err) {
       console.error('Error during hotel search:', err);
       if (err.response && err.response.status === 429) {
@@ -143,3 +146,4 @@ function Search() {
 }
 
 export default Search;
+

@@ -136,7 +136,7 @@ function Home() {
                       aria-label="Search hotels in the selected governorate"
                     >
                       <i className="fas fa-search me-2"></i>
-                      Search Hotels
+                      Search
                     </Button>
                   </div>
                 </Form>

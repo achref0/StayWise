@@ -17,18 +17,17 @@ function HotelCard({ hotel }) {
           {hotel.telephone}
         </Card.Text>
         <Card.Text className="fw-bold text-primary">
-          {hotel.price1 ? `$${hotel.price1}` : 'Price on request'}
+          {hotel.price1 ? `${hotel.price1}` : 'Price on request'}
         </Card.Text>
       </Card.Body>
       <Card.Footer className="bg-white border-top-0">
-        <Button 
-          as={Link} 
-          to={`/hotel/${hotel.hotelId}`} 
-          variant="outline-primary" 
-          className="w-100"
+        <Link 
+          to={`/hotel/${hotel.hotelId}`}
+          state={{ hotel: hotel }}
+          className="btn btn-outline-primary w-100"
         >
           View Details
-        </Button>
+        </Link>
       </Card.Footer>
     </Card>
   );
