@@ -8,15 +8,15 @@ body {
 
 /* Navbar custom height */
 .custom-navbar {
-  padding: 0.5rem 0; /* Reduce the top and bottom padding to make the navbar thinner */
-  z-index: 3; /* Ensure navbar stays on top */
+  padding: 0.5rem 0;
+  z-index: 3;
 }
 
 /* Override the default padding inside the navbar */
 .custom-navbar .navbar-brand, 
 .custom-navbar .navbar-nav .nav-link {
-  padding-top: 0.2rem; /* Reduce the top padding */
-  padding-bottom: 0.2rem; /* Reduce the bottom padding */
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
 }
 
 /* Ensure the hero section takes full width and no padding/margin */
@@ -28,11 +28,11 @@ body {
   display: flex;
   align-items: center;
   color: #fff;
-  padding: 0; /* Remove padding */
-  margin: 0; /* Remove margin */
+  padding: 0;
+  margin: 0;
   z-index: 2;
   width: 100%;
-  top: 0; /* Ensure it starts from the top of the page */
+  top: 0;
 }
 
 /* Add overlay for better text contrast */
@@ -43,7 +43,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* Dark transparent overlay */
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 1;
 }
 
@@ -68,8 +68,8 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: cover;
-  background-position: center;
+  background-size: cover; /* Ensure images cover the entire container */
+  background-position: center; /* Center the image */
   opacity: 0;
   transition: opacity 1s ease-in-out;
 }
@@ -80,7 +80,7 @@ body {
 
 .hero-section h1,
 .hero-section p {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Adding shadow for better text visibility */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .feature-card {
@@ -117,22 +117,20 @@ body {
   }
 }
 
-
-
 .carousel-image {
-  max-height: 500px;  /* Set a maximum height to make the images smaller */
-  width: 100%;       /* Maintain the image aspect ratio */
-  object-fit: contain;  /* Ensure the images fit within the container without being cropped */
-  margin: 0 auto;     /* Center the images */
-  display: block;     /* Ensure images are displayed as block elements */
+  max-height: 500px;
+  width: 100%;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
 }
 
 .carousel-control-prev, .carousel-control-next {
-  width: 5%;  /* Reduce the width of the control areas */
+  width: 5%;
 }
 
 .carousel-control-prev-icon, .carousel-control-next-icon {
-  background-size: 50%, 50%;  /* Scale the size of the arrow icons */
+  background-size: 50%, 50%;
 }
 
 /* Optional: Customize the arrow color */
@@ -143,8 +141,3 @@ body {
 .carousel-control-next-icon {
   background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns%3D"http://www.w3.org/2000/svg" viewBox%3D"0 0 16 16"%3E%3Cpath fill%3D"%23000" d%3D"M4.646 1.354a.5.5 0 0 1 0 .708L9.293 6.707 4.646 11.354a.5.5 0 1 1-.708-.708l5-5a.5.5 0 0 1 0-.708l-5-5a.5.5 0 0 1 .708 0z"%3E%3C/path%3E%3C/svg%3E');
 }
-
-
-
-
-

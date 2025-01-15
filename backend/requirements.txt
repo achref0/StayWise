@@ -1,6 +1,9 @@
-Flask==2.3.2
+Flask==2.0.1
 Flask-CORS==3.0.10
-requests==2.31.0
-python-dotenv==1.0.0
+python-dotenv==0.19.0
+requests==2.26.0
+PyJWT==2.3.0
+Werkzeug==2.0.1
+mysqlclient==2.2.7
 wikipedia-api==0.7.1
-beautifulsoup4==4.12.2
+mysql-connector-python==9.1.0

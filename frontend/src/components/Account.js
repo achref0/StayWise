@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Button, ProgressBar } from 'react-bootstrap';
+import { Container, Card, Button, ProgressBar, Alert } from 'react-bootstrap';
 import { getAccountInfo } from '../utils/api';
+import { useAuth } from '../contexts/AuthContext';
 
 function Account() {
   const [accountInfo, setAccountInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetchAccountInfo();
-  }, []);
+    if (user) {
+      fetchAccountInfo();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   const fetchAccountInfo = async () => {
     setLoading(true);
@@ -22,6 +28,14 @@ function Account() {
     }
     setLoading(false);
   };
+
+  if (!user) {
+    return (
+      <Container className="mt-5">
+        <Alert variant="warning">Please log in to view your API usage.</Alert>
+      </Container>
+    );
+  }
 
   if (loading) {
     return (
@@ -57,10 +71,9 @@ function Account() {
     <Container className="mt-5">
       <Card className="shadow-lg">
         <Card.Header className="bg-primary text-white">
-          <h2 className="mb-0">Account Information</h2>
+          <h2 className="mb-0">API Usage Overview</h2>
         </Card.Header>
         <Card.Body>
-          <h3 className="mb-4">API Usage Overview</h3>
           <ProgressBar 
             now={usagePercentage} 
             label={`${usagePercentage.toFixed(1)}%`} 
