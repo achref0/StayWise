@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, send_from_directory, request, jsonify, make_response
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -358,7 +358,7 @@ def search_hotels():
                 )
                 processed_city = data_processor.process_city_search(city_results)
                 return jsonify(processed_city)
-            except requests.exceptions.HTTPError as e:
+            except request.exceptions.HTTPError as e:
                 if e.response.status_code == 429:
                     logging.error(f"Error in search_hotels: {str(e)}")
                     return jsonify({"error": "Request limit reached. Please try again later."}), 429
@@ -385,5 +385,5 @@ def test_auth(current_user):
     }), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
