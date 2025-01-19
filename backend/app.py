@@ -53,6 +53,9 @@ TUNISIAN_GOVERNORATES = {
 # Simple cache to store city IDs for previously searched queries
 city_id_cache = {}
 
+# JWT Secret Key
+app.config['SECRET_KEY'] = os.getenv('JWT_SECRET')
+
 # Database connection
 def get_db_connection():
     try:
@@ -67,8 +70,6 @@ def get_db_connection():
         print(f"Error connecting to MySQL Database: {e}")
         return None
 
-# JWT Secret Key
-app.config['SECRET_KEY'] = os.getenv('JWT_SECRET')
 
 # Authentication decorator
 def token_required(f):
@@ -124,6 +125,14 @@ def get_user_by_username(username):
     finally:
         conn.close()
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react_app(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+        
 # Authentication routes
 @app.route('/api/signup', methods=['POST'])
 def signup():
